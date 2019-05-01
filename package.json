@@ -1,0 +1,27 @@
+{
+  "name": "goose",
+  "version": "1.0.0",
+  "description": "## Description",
+  "main": "index.js",
+  "scripts": {
+    "start": "concurrently \"npm run backend\" \"npm run frontend\"",
+    "backend": "cd backend && npm run start",
+    "frontend": "cd frontend && npm run build",
+    "build": "cd frontend && npm run build",
+    "deploy": "npm run build && cd backend && now",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jawwwr/koa-socketio.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jawwwr/koa-socketio/issues"
+  },
+  "homepage": "https://github.com/jawwwr/koa-socketio#readme",
+  "devDependencies": {
+    "concurrently": "^3.5.1"
+  }
+}
