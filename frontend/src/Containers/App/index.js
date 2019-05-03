@@ -5,6 +5,7 @@ import axios from 'axios';
 import { Rooms } from '../../Components/Rooms'
 import { ChatRoom } from '../../Components/ChatRoom'
 import { apiUrl } from '../../Services/api'
+import { initializeSocket } from '../../Services/socket'
 import './styles.scss';
 
 class App extends Component {
@@ -24,6 +25,7 @@ class App extends Component {
   }
 
   async componentDidMount() {
+    initializeSocket()
     this.setState({
       loading: true
     })
@@ -43,6 +45,7 @@ class App extends Component {
     this._fetchActiveRoomMessage(id)
     this._fetchActiveRoomDetails(id)
     this.props.history.replace(general[0].room_name)
+    
   }
 
   _onSwitchRoom = (id) => () => {
