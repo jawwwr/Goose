@@ -14,12 +14,24 @@ Chat App using :
 
 Install dependencies
 
+on root folder
+```
+npm install
+```
+on backend folder
+```
+npm install
+```
+on frontend folder
 ```
 npm install
 ```
 
+
+
 Start a Local Server
 
+on root folder
 ```
 npm start
 ```
