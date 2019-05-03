@@ -11,6 +11,9 @@ router.prefix(`/${baseApi}/${api}`);
 // POST /api/user
 router.post('/', UserControllers.create);
 
+// GET /api/user
+router.get('/', UserControllers.find);
 
+router.get('/:id', UserControllers.findOne);
 
 export default router;

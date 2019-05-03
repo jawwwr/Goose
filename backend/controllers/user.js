@@ -7,6 +7,19 @@ async function create (ctx) {
   ctx.body = savedUser
 }
 
+async function find (ctx) {
+  // List users
+  ctx.body = await User.find({})
+}
+
+async function findOne (ctx) {
+  // Find User by Id
+  const { id: _id } = ctx.params
+  ctx.body = await User.findOne({_id})
+}
+
 module.exports = {
-  create
+  create,
+  find,
+  findOne
 }
