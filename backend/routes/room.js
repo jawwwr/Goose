@@ -8,8 +8,17 @@ const router = new Router();
 
 router.prefix(`/${baseApi}/${api}`);
 
+// GET /api/room
+router.get('/', RoomControllers.find);
+
+// GET /api/room/:id
+router.get('/:id', RoomControllers.findOne);
+
 // POST /api/room
 router.post('/', RoomControllers.create);
+
+// PUT /api/room/:id
+router.put('/:id', RoomControllers.update);
 
 
 

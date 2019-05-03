@@ -1,0 +1,21 @@
+@import '../../Assets/styles/colors';
+
+.Wrapper {
+    .room-name {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #0283FF;
+    }
+    .chat-window {
+        display: flex;
+        justify-content: space-between;
+        .chat-container {
+            width: 75%;
+            border-right: 1px solid #F1F0F0;
+            margin-right: 1rem;
+        }
+        .members-container {
+            width: 25%;
+        }
+    }
+}

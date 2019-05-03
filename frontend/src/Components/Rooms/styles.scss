@@ -1,0 +1,18 @@
+@import '../../Assets/styles/colors';
+
+.rooms {
+  margin-bottom: 2rem;
+  .type {
+    font-size: 1rem;
+    font-weight: 600;
+  }
+  .room {
+    font-size: .8rem;
+    padding-left: .5rem;
+    .room-name {
+      color: $dark-gray;
+      border: none;
+      cursor: pointer;
+    }
+  }
+}

@@ -23,5 +23,8 @@
   "homepage": "https://github.com/jawwwr/koa-socketio#readme",
   "devDependencies": {
     "concurrently": "^3.5.1"
+  },
+  "dependencies": {
+    "axios": "^0.18.0"
   }
 }
