@@ -1,5 +1,8 @@
 /* eslint-disable import/prefer-default-export */
 export const conneXionListener = (io, socket) => {
+    console.log('Socket connecting... ');
+    socket.send('You have been connected!')
+
     const connections = [];
     const users = [];
     connections.push(socket);
@@ -19,6 +22,7 @@ export const conneXionListener = (io, socket) => {
         users: roomUsers,
         room
     }
+    console.log('data: ', data);
     if(source === "disconnected") {
         socket.to(room).emit('update room users', data);
     } else {

@@ -15,7 +15,9 @@ import routing from './routes';
 const app = new Koa();
 const router = new Router();
 const server = http.createServer(app.callback());
-const io = socketIO(server);
+const io = socketIO(server, {
+  transports: ['websocket']
+});
 
 mongoose.connect(process.env.DB_CONNECTION, { useNewUrlParser: true });
 mongoose.connection.on('error', console.error);
