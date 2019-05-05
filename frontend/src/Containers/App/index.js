@@ -1,130 +1,75 @@
 import React, { Component } from 'react';
-import { BrowserRouter as Router } from "react-router-dom";
-import { withRouter } from "react-router";
 import axios from 'axios';
-import { Rooms } from '../../Components/Rooms'
-import { ChatRoom } from '../../Components/ChatRoom'
+import { Login } from '../../Components/Login'
+import Home from '../Home'
+
 import { apiUrl } from '../../Services/api'
-import { initializeSocket } from '../../Services/socket'
 import './styles.scss';
 
 class App extends Component {
   constructor(props) {
     super(props);
-    this._mainWindow = this._mainWindow.bind(this)
-    this._fetchActiveRoomDetails = this._fetchActiveRoomDetails.bind(this)
-    this._fetchActiveRoomMessage = this._fetchActiveRoomMessage.bind(this)
-    this._onSwitchRoom = this._onSwitchRoom.bind(this)
-    this.state = { 
-      loading: false,
-      active_room: false,
-      active_room_name: '',
-      rooms: [],
-      messages: []
+    this._login = this._login.bind(this)
+    this._onChangeUserName = this._onChangeUserName.bind(this)
+    this.state = {
+      user_name: '',
+      authenticated: false,
     };
   }
 
-  async componentDidMount() {
-    initializeSocket()
+  componentWillMount() {
+    if(localStorage.getItem("goose_user_id")){
+      this.setState({
+        authenticated: true
+      })
+    }
+  }
+
+  _login = async ()=> {
+    let response = []
+    if(this.state.user_name !== '') {
+       response = await axios.post(`${apiUrl}/user`,  {
+        user_name: this.state.user_name,
+      })
+      if(response.status === 200) {
+        await axios.put(`${apiUrl}/room/5cca9c77cc29f540e48b3958`,  {
+          members: response.data._id,
+        })
+        localStorage.setItem("goose_user_id", response.data._id)
+        localStorage.setItem("goose_user_name", response.data.user_name)
+        window.location.reload()
+      }
+    } else {
+      alert("username pls")
+    }
+  }
+
+  _onChangeUserName(event) {
+
     this.setState({
-      loading: true
+      user_name: event.target.value
     })
-
-    const response = await axios.get(`${apiUrl}/room`)
-
-    const general = response.data
-    .filter(obj => obj.room_name === "General")
-
-    const id = general[0]._id;
-    this.setState({
-      rooms: response.data,
-      active_room_name: general[0].room_name,
-      loading: false
-    })
-
-    this._fetchActiveRoomMessage(id)
-    this._fetchActiveRoomDetails(id)
-    this.props.history.replace(general[0].room_name)
-    
-  }
-
-  _onSwitchRoom = (id) => () => {
-    this._fetchActiveRoomMessage(id)
-    this._fetchActiveRoomDetails(id)
-  }
-
-  async _fetchActiveRoomMessage(id) {
-    const response = await axios.get(`${apiUrl}/chat`)
-  }
-
-  async _fetchActiveRoomDetails(id) {
-    const response = await axios.get(`${apiUrl}/room/${id}`)
-    this.setState({
-      active_room_name: response.data.room_name,
-      active_room: response.data
-    })
-  }
-
-  _mainWindow({ match }) {
-    return (
-      <ChatRoom
-        id={match.params.id}
-        data={this.state}
-      />
-    );
   }
 
   render() {
-    const { rooms } = this.state
-    const privates = []
-    const groups = []
-
-    rooms.map( (item, i) => {
-      if(item.type === 'private'){
-        return privates.push(item)
-      }else {
-       return groups.push(item)
-      }
-    })
-
     return (
-      <Router>
-      <div className="App">
-        <div className="App-container">
-            <div className="container sidebar rooms">
-              <h1 className="brand-name">Goose</h1>
-              <div className="tabs">
-                <p className="tab-title">Messages</p>
-                  {
-                    privates.length !== 0 || privates.length !== 0 ?
-                    <div className="room-container">
-                      <Rooms
-                      title={"Direct"}
-                      switchRoom={this._onSwitchRoom}
-                      data={privates}
-                    />
-                    <Rooms 
-                      title={"Groups"}
-                      switchRoom={this._onSwitchRoom} 
-                      data={groups}
-                    />
-                    </div>
-                    : ''
-                  }
-              </div>
-            </div>
-            <div className="container main">
-            <ChatRoom
-              data={this.state}
-            />
-            </div>
+        <div className="App">
+          {
+            this.state.authenticated ? (
+              <Home/>
+            ) : (
+              <Login
+                user_name={this.state.user_name}
+                login={this._login}
+                onChangeUser={this._onChangeUserName}
+              />
+            )
+          }
         </div>
-      </div>
-      </Router>
     );
   }
 
 }
 
 
-export default withRouter(App);
+export default App;

@@ -1,21 +1,40 @@
 @import '../../Assets/styles/colors';
 
 .Wrapper {
-    .room-name {
-        font-size: 1.3rem;
-        font-weight: 600;
-        color: #0283FF;
-    }
-    .chat-window {
-        display: flex;
-        justify-content: space-between;
-        .chat-container {
-            width: 75%;
-            border-right: 1px solid #F1F0F0;
-            margin-right: 1rem;
-        }
-        .members-container {
-            width: 25%;
+    .chat-room {
+        .list {
+            width: 100%;
+            display: inline-flex;
+            flex-direction: column;
+            .msg {
+                background-color: $off-white;
+                border-radius: 20px;
+                display: flex;
+                flex-direction: column;
+                margin-top: .2rem;
+                &.left {
+                    align-self: flex-start;
+                    p:first-child {
+                        font-size: .8rem;
+                        margin-bottom: 0;
+                        
+                        color: $secondary-blue;
+                    }
+                }
+                &.right {
+                    background-color: $secondary-blue;
+                    color: $primary-white;
+                    align-self: flex-end;
+                    p:first-child {
+                        display: none;
+                    }
+                }
+                p {
+                    font-size: .9rem;
+                    border-radius: 10px;
+                    margin: .5rem;
+                }
+            }
         }
     }
 }

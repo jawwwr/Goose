@@ -1,0 +1,40 @@
+@import '../../Assets/styles/colors';
+
+.Wrapper {
+    .chat-input {
+        form {
+            display: flex;
+            textarea {
+                float: left;
+                font-size: 1.5rem;
+                resize: none;
+                width: 90%;
+                border: 1px solid $off-white; 
+                border-top-left-radius: 5px;
+                border-bottom-left-radius: 5px;
+                -webkit-box-shadow: none;
+                -moz-box-shadow: none;
+                box-shadow: none;
+                overflow: auto;
+                outline: none;
+
+            }
+            label {
+                color: $primary-white;
+                background-color: $secondary-blue;
+                cursor: pointer;
+                width: 5rem;
+                font-size: 1rem;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                border-top-right-radius: 5px;
+                border-bottom-right-radius: 5px;
+            }
+            input {
+                display: none;
+            }
+        }
+        
+    }
+}

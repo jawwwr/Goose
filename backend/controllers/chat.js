@@ -10,9 +10,11 @@ async function findChatByRooms (ctx) {
 
 async function findChatByRoom (ctx) {
   // Fetch all Chat's from the database and return as payload
-  const { roomId } = ctx.params
-  const roomChat = await Chat.find({room_id: roomId})
-  ctx.body = roomChat
+  const id = ctx.params.room_id
+  const roomChat = await Chat.find({room: id})
+  const opts = [{ path: 'room', select: 'room_name' }, { path: 'sender', select: 'user_name' }];
+  const populated = await Chat.populate(roomChat, opts)
+  ctx.body = populated
 }
 
 async function create (ctx) {

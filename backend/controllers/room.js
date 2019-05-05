@@ -27,7 +27,7 @@ async function create (ctx) {
 async function update (ctx) {
   const { id } = ctx.params
   const { members } = ctx.request.body
-  const updatedRoom = await Room.findByIdAndUpdate({_id: id}, {members})
+  const updatedRoom = await Room.findByIdAndUpdate({_id: id}, {$addToSet: { members }})
   const opts = [{ path: 'members', select: 'user_name' }, { path: 'creator', select: 'user_name' }];
   const populated = await Room.populate(updatedRoom, opts)
   ctx.body = populated

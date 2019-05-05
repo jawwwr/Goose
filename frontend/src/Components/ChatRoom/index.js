@@ -1,24 +1,27 @@
 import React from 'react';
 import "./styles.scss"
+
 export const ChatRoom = (props) => {
-  const { active_room, active_room_name } = props.data
-  const { members = [] } = active_room
-  console.log(members)
+  const { data, divRef } = props
   return (
     <div className="Wrapper chat-room">
-        <h2 className="room-name">{active_room_name}</h2>
-        <div className="chat-window">
-          <div className="chat-container">
-            <p>Hi</p>
-          </div>
-          <div className="members-container">
-          {
-            members.map((item) => {
-              return <p key={item._id}>{item.user_name}</p>
-            })
-          }
-          </div>
-        </div>
+      <div className="list">
+      {
+        data.map((item) => {
+          return <div 
+              className={item.sender.user_name === localStorage.getItem('goose_user_name') ? "msg right" : "msg left"}
+              key={item._id}>
+              <p>
+              {item.sender.user_name}
+              </p>
+              <p>
+              {item.text}
+              </p>
+            </div>
+        })
+      }
+      <div ref={divRef} />
+      </div>
     </div>
   )
 }

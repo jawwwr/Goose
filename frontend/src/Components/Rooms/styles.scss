@@ -9,8 +9,10 @@
   .room {
     font-size: .8rem;
     padding-left: .5rem;
+    margin: .5rem 0;
     .room-name {
       color: $dark-gray;
+      text-decoration: none;
       border: none;
       cursor: pointer;
     }

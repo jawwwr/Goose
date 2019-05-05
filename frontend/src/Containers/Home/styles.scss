@@ -1,0 +1,74 @@
+@import '../../Assets/styles/colors';
+
+.App {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: $dark-gray;
+  background: #FC466B;  /* fallback for old browsers */
+  background: -webkit-linear-gradient(to top, #3F5EFB, #FC466B);  /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to top, #3F5EFB, #FC466B); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+  .App-container {
+    position: relative;
+    display: flex;
+    background-color: $primary-white;
+    height: 80vh;
+    width: 70%;
+    margin: 1rem;
+    border-radius: 10px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+    
+    .logout-btn {
+      position: absolute;
+      right: .5rem;
+      top: .5rem;
+      font-size: .9rem;
+
+      button {
+        margin-left: .5rem;
+        border-radius: 1rem;
+        padding: .3rem .7rem;
+      }
+      
+    }
+    .container {
+      margin: 1rem;
+    }
+    .sidebar {
+      width: 20%;
+      display: flex;
+      flex-direction: column;
+      &.rooms {
+        border-right: 1px solid $off-white;
+      }
+      .brand-name {
+        margin: 0;
+        font-size: 2rem;
+        background: -webkit-linear-gradient(to top, #3F5EFB, #FC466B);  /* Chrome 10-25, Safari 5.1-6 */
+        background: linear-gradient(to top, #3F5EFB, #FC466B); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .tabs {
+        .tab-title {
+          font-size: 1.3rem;
+          font-weight: 600;
+          color: $secondary-blue;
+          margin-bottom: -5px;
+        }
+      }
+    }
+    .main {
+      width: 80%;
+    }
+  }
+    /* width */
+  ::-webkit-scrollbar {
+    width: 1px;
+  }
+}
