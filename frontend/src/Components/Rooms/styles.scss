@@ -2,9 +2,18 @@
 
 .rooms {
   margin-bottom: 2rem;
-  .type {
-    font-size: 1rem;
-    font-weight: 600;
+  .title-action {
+    display: flex;
+    justify-content: space-between;
+    .type {
+      font-size: 1rem;
+      font-weight: 600;
+      &.action {
+        margin-right: 8px;
+        color: $secondary-blue;
+        cursor: pointer;
+      }
+    }
   }
   .room {
     font-size: .8rem;

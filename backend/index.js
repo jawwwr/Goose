@@ -40,7 +40,7 @@ app
 
 // Start the application
 server.listen(process.env.PORT, () =>
-  console.log(`✅  The server is running at http://localhost:${process.env.PORT}/`)
+  console.log(`✅  The server is running at ${process.env.HOST}:${process.env.PORT}/`)
 )
 
 export default app;

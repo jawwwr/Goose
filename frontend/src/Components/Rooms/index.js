@@ -3,11 +3,18 @@ import { Link } from "react-router-dom";
 import './styles.scss';
 
 export const Rooms = (props) => {
-  const { title, data, switchRoom } = props;
+  const { title, data, switchRoom, addRoom } = props;
 
   return (
     <div className="rooms">
+        <div className="title-action">
         <p className="type">{title}</p>
+        {
+          title==='Groups' ?
+          <p className="type action" onClick={addRoom}>+</p> :
+          ''
+        } 
+        </div>
         {
           data.length !== 0 ?
           data.map((item)=> {

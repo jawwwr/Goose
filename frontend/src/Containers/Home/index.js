@@ -5,7 +5,7 @@ import axios from 'axios';
 import { Rooms } from '../../Components/Rooms'
 import { ChatContainer } from '../../Components/ChatContainer'
 import { apiUrl } from '../../Services/api'
-import { initializeSocket } from '../../Services/socket'
+import { initializeSocket } from '../../Services/socket/'
 import './styles.scss';
 
 class Home extends Component {
@@ -14,6 +14,7 @@ class Home extends Component {
     this._fetchActiveRoomDetails = this._fetchActiveRoomDetails.bind(this)
     this._fetchActiveRoomMessage = this._fetchActiveRoomMessage.bind(this)
     this._onSwitchRoom = this._onSwitchRoom.bind(this)
+    this._onAddRoom = this._onAddRoom.bind(this)
     this._handleChange = this._handleChange.bind(this)
     this._handleSubmit = this._handleSubmit.bind(this)
     this._scrollToBottom = this._scrollToBottom.bind(this)
@@ -37,7 +38,6 @@ class Home extends Component {
     })
 
     const response = await axios.get(`${apiUrl}/room`)
-
     const general = response.data.filter(obj => obj.room_name === "General")
 
     const id = general[0]._id;
@@ -59,6 +59,15 @@ class Home extends Component {
   _onSwitchRoom = (id) => () => {
     this._fetchActiveRoomMessage(id)
     this._fetchActiveRoomDetails(id)
+  }
+
+  _onAddRoom = async () => {
+    const room_name = prompt("Please enter new room name:");
+    const creator = localStorage.getItem('goose_user_id')
+    if (room_name !== null || room_name !== "") {
+      const response = await axios.post(`${apiUrl}/room`, {room_name, type: 'group', creator, members: creator})
+      console.log(response)
+    } 
   }
 
   _fetchActiveRoomMessage = async (id) => {
@@ -133,7 +142,7 @@ class Home extends Component {
               <div className="tabs">
                 <p className="tab-title">Messages</p>
                   {
-                    privates.length !== 0 || privates.length !== 0 ?
+                    privates.length !== 0 || groups.length !== 0 ?
                     <div className="room-container">
                       <Rooms
                       title={"Direct"}
@@ -143,6 +152,7 @@ class Home extends Component {
                     <Rooms 
                       title={"Groups"}
                       switchRoom={this._onSwitchRoom} 
+                      addRoom={this._onAddRoom} 
                       data={groups}
                     />
                     </div>
