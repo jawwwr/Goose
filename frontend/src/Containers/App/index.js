@@ -3,13 +3,19 @@ import { BrowserRouter as Router } from "react-router-dom";
 import { withRouter } from "react-router";
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
+import Alert from 'react-s-alert';
 import { Rooms } from '../../Components/Rooms'
 import { ChatContainer } from '../../Components/ChatContainer'
 import { Login } from '../../Components/Login'
 import { apiUrl } from '../../Services/api'
-import { socket, onNewUser, onSendChat, onAddRoom, onSendInvitation, onAcceptedInvite, onCanceledInvite } from '../../Services/socket'
+import { socket, onNewUser, onSendChat, onAddRoom, onSendInvitation, onAcceptedInvite, onBuzz } from '../../Services/socket'
 import 'react-toastify/dist/ReactToastify.css';
+import 'react-s-alert/dist/s-alert-default.css';
+import 'react-s-alert/dist/s-alert-css-effects/slide.css';
 import './styles.scss';
+
+import buzz from  '../../Assets/sounds/buzz.mp3'
+import junel from  '../../Assets/sounds/junel.mp3'
 
 class App extends Component {
   constructor(props) {
@@ -18,7 +24,7 @@ class App extends Component {
     this._handleSubmit = this._handleSubmit.bind(this)
     this._login = this._login.bind(this)
     this._onAddRoom = this._onAddRoom.bind(this)
-    this.send_chat_room_onChangeUserName = this._onChangeUserName.bind(this)
+    this._onChangeUserName = this._onChangeUserName.bind(this)
     this._onLogout = this._onLogout.bind(this)
     this._onSwitchRoom = this._onSwitchRoom.bind(this)
     this._onClickUser = this._onClickUser.bind(this)
@@ -73,6 +79,7 @@ class App extends Component {
         })
         
         this._notify(`${data.user.user_name} ${message}!`)
+        this._notify(`${data.user.user_name} ${message}!`)
       }); 
 
       // when someone new user or reloaded the browser.
@@ -120,10 +127,18 @@ class App extends Component {
           className: 'goose-toast invite'
         })
       }); 
-      // when new room added, update my list.
+
       socket.on('invitation_accepted', (data) => {
         this._notify(data.message); 
-  });
+    });
+    // buzzzzerrrr
+      socket.on('buzz_all', (data) => {
+        Alert.info(data, {
+          position: 'bottom-left',
+          effect: 'slide',
+          beep: junel
+      });
+    });
   }
   async componentDidUpdate(prevProps, prevState) {
     if(this.state.authenticated) {
@@ -278,6 +293,10 @@ class App extends Component {
   _onAcceptInvite = (data) => {
       onAcceptedInvite(data)
   }
+  
+  _onBuzzer = () => {
+    onBuzz(this.state.me.user_name)
+  }
 
   NotifyAction = (props, { closeToast }) => {
     const {data, acceptInvite} = props
@@ -364,6 +383,7 @@ class App extends Component {
               <div className="container main">
               <ChatContainer
                 divRef={this.messagesEnd}
+                onBuzz={this._onBuzzer}
                 chat_message={this.state.chat_message}
                 clickUser={this._onClickUser}
                 handleChange={this._handleMessageChange}
@@ -377,6 +397,7 @@ class App extends Component {
             )
           }
           <ToastContainer />
+          <Alert stack={{limit: 5}} />
           </div>
       </Router>
     );

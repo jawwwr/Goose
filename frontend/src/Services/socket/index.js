@@ -35,6 +35,10 @@ const onCanceledInvite = (data) => {
     socket.emit('send_chat_invite_denied', data);
 }
 
+const onBuzz = (data) => {
+    socket.emit('on_buzz_all', data);
+}
+
 
 export {
     socket,
@@ -44,6 +48,7 @@ export {
     onJoinRoom,
     onSendInvitation,
     onAcceptedInvite,
-    onCanceledInvite
+    onCanceledInvite,
+    onBuzz
 }
 

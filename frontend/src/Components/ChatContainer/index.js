@@ -4,7 +4,7 @@ import {ChatRoom} from '../ChatRoom'
 import "./styles.scss"
 
 export const ChatContainer = (props) => {
-  const { active_room, active_room_msg, handleChange, handleSubmit, chat_message, divRef, clickUser } = props
+  const { active_room, active_room_msg, handleChange, handleSubmit, chat_message, divRef, clickUser, onBuzz } = props
 
   const { members, room_name } = active_room
   console.log(members)
@@ -18,6 +18,7 @@ export const ChatContainer = (props) => {
               divRef={divRef}
             />
             <ChatInput 
+              onBuzz={onBuzz}
               chat_message={chat_message}
               handleSubmit={handleSubmit}
               handleChange={handleChange}/>

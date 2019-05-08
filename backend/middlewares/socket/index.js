@@ -56,5 +56,10 @@ export const conneXionListener = (io, socket) => {
         io.emit('new_room', data.room);
         socket.emit('new_room_update_me', {...data});
     })
+
+    socket.on('on_buzz_all', (data) => {
+        const message = `${data} buzzzz!!`
+        io.emit('buzz_all', message);
+    })
     
 }
