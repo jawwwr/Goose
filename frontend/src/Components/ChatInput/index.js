@@ -11,7 +11,13 @@ export const ChatInput = (props) => {
       <form onSubmit={props.handleSubmit}>
         <textarea 
           value={props.chat_message} 
-          onChange={props.handleChange} />
+          onChange={props.handleChange} 
+          onKeyDown={(e) =>  {
+            if(e.keyCode === 13 && e.shiftKey === false) {
+              e.preventDefault();
+              props.handleSubmit(e);
+            }
+          }}/>
           <label htmlFor="submit">Send</label>
           <input id="submit" type="submit" value="Submit" />
       </form>

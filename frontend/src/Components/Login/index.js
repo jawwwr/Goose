@@ -8,6 +8,12 @@ export const Login = (props) => {
         <input 
           value={user_name} 
           onChange={onChangeUser} 
+          onKeyDown={(e) => {
+            if(e.keyCode === 13 && e.shiftKey === false) {
+              e.preventDefault();
+              props.login();
+            }
+          }}
         />
         <label htmlFor="login" onClick={login}>login</label>
         <input className="login-btn" id="login" type="submit" value="Submit" />
