@@ -7,6 +7,11 @@ const roomSchema = mongoose.Schema({
     ],
     type: {type: String, required: true},
     creator: {type: mongoose.Schema.Types.ObjectId, ref: 'User'}
+},
+{ 
+    timestamps: { 
+        createdAt: 'created_at' 
+    }
 });
 
 module.exports = mongoose.model('Room', roomSchema);

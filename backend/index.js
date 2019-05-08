@@ -16,13 +16,14 @@ const app = new Koa();
 const router = new Router();
 const server = http.createServer(app.callback());
 const io = socketIO(server, {
-  transports: ['websocket']
+  transports: ['websocket'],
+  pingTimeout: 30000
 });
 
 mongoose.connect(process.env.DB_CONNECTION, { useNewUrlParser: true });
 mongoose.connection.on('error', console.error);
 
-io.on('connection', (socket) => conneXionListener(io, socket))
+io.on('connect', (socket) => conneXionListener(io, socket))
 
 routing(app);
 

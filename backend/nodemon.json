@@ -2,8 +2,9 @@
   "env": {
       "PORT": "3010",
       "BASE_API": "api",
-      "HOST": "http://10.0.4.247",
-      "DB_CONNECTION": "mongodb://10.0.4.247/goose-chat"
+      "HOST_OFC": "http://10.0.4.247",
+      "HOST": "http://localhost",
+      "DB_CONNECTION": "mongodb://localhost/goose-chat"
 
   }
 }

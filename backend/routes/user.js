@@ -8,12 +8,13 @@ const router = new Router();
 
 router.prefix(`/${baseApi}/${api}`);
 
-// POST /api/user
 router.post('/', UserControllers.create);
 
-// GET /api/user
 router.get('/', UserControllers.find);
 
 router.get('/:id', UserControllers.findOne);
+
+router.put('/:id', UserControllers.update);
+router.put('/socket/:id', UserControllers.updateSocket);
 
 export default router;

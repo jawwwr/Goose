@@ -11,6 +11,8 @@ router.prefix(`/${baseApi}/${api}`);
 // GET /api/room
 router.get('/', RoomControllers.find);
 
+router.get('/check/:type/:fId/:sId/', RoomControllers.checkRooms);
+
 // GET /api/room/:id
 router.get('/:id', RoomControllers.findOne);
 

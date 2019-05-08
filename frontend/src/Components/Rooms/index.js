@@ -1,5 +1,4 @@
 import React from 'react';
-import { Link } from "react-router-dom";
 import './styles.scss';
 
 export const Rooms = (props) => {
@@ -20,7 +19,7 @@ export const Rooms = (props) => {
           data.map((item)=> {
           return (
             <div key={item._id} className="room">
-              <Link onClick={switchRoom(item._id)} to={`/${item.room_name}`} className="room-name">{item.room_name}</Link>
+              <div onClick={()=>switchRoom(item)} className="room-name">{item.room_name}</div>
             </div>
           )
           })

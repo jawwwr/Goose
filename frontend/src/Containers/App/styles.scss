@@ -22,6 +22,19 @@
     border-radius: 10px;
     box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
     
+    .logout-btn {
+      position: absolute;
+      right: .5rem;
+      top: .5rem;
+      font-size: .9rem;
+
+      button {
+        margin-left: .5rem;
+        border-radius: 1rem;
+        padding: .3rem .7rem;
+      }
+      
+    }
     .container {
       margin: 1rem;
     }
@@ -52,6 +65,38 @@
     }
     .main {
       width: 80%;
+    }
+  }
+  /* width */
+  ::-webkit-scrollbar {
+    width: 1px;
+  }
+  .goose-toast {
+    background-color: $primary-white;
+    font-size: 1.1rem;
+    min-height: 3rem;
+    width: 15rem;
+    &.invite {
+      background-color: $pink;
+      color: $primary-white;
+    }
+    .notify-action {
+      .actions {
+        display: flex;
+        justify-content: space-around;
+        .action {
+          padding: .5rem 1rem;
+          border: none;
+          
+          &.yes {
+            background-color: $secondary-blue;
+            color: $primary-white;
+          }
+          &.no {
+            background-color: $off-white;
+          }
+        }
+      }
     }
   }
 }

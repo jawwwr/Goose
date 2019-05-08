@@ -1,27 +1,25 @@
 const Chat = require('../models/chat')
 
+const opts = [{ path: 'room', select: 'room_name' }, { path: 'sender', select: 'user_name' }];
+
 async function findChatByRooms (ctx) {
-  // Fetch all Chat's from the database and return as payload
   const chatByRooms = await Chat.find({})
-  const opts = [{ path: 'room', select: 'room_name' }, { path: 'sender', select: 'user_name' }];
   const populated = await Chat.populate(chatByRooms, opts)
   ctx.body = populated
 }
 
 async function findChatByRoom (ctx) {
-  // Fetch all Chat's from the database and return as payload
   const id = ctx.params.room_id
   const roomChat = await Chat.find({room: id})
-  const opts = [{ path: 'room', select: 'room_name' }, { path: 'sender', select: 'user_name' }];
   const populated = await Chat.populate(roomChat, opts)
   ctx.body = populated
 }
 
 async function create (ctx) {
-  // Create New Chat from payload sent and save to database
   const newChat = new Chat(ctx.request.body)
   const savedChat = await newChat.save()
-  ctx.body = savedChat
+  const populated = await Chat.populate(savedChat, opts)
+  ctx.body = populated
 }
 
 module.exports = {
