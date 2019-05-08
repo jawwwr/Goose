@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 const User = require('../models/user')
 const Room = require('../models/room')
 
@@ -5,13 +6,15 @@ const userOpts = [{ path: 'rooms', select: 'room_name' }];
 const roomOpts = [{ path: 'members', select: 'user_name' }, { path: 'creator', select: 'user_name' }];
 
 async function create (ctx) {
-  const newUser = new User(ctx.request.body)
-  const { rooms, _id } = newUser
-  const savedUser = await newUser.save()
-  await Room.findByIdAndUpdate({_id: rooms[0]}, {$addToSet: { members: _id}}, {new: true})
+  const { body } = ctx.request
+  const { user_name, rooms } = body
+  const user = await User.findOneAndUpdate({ user_name }, body, {upsert: true})
+  const { _id: members } = user
+
+  await Room.findByIdAndUpdate({_id: rooms}, {$addToSet: { members }}, {new: true})
   const Rooms = await Room.find({})
   const roomPopulated = await Room.populate(Rooms, roomOpts)
-  const userPopulated = await User.populate(savedUser, userOpts)
+  const userPopulated = await User.populate(user, userOpts)
 
   ctx.body = {user: userPopulated, rooms: roomPopulated }
 }
