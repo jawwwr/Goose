@@ -7,7 +7,7 @@ export const ChatContainer = (props) => {
   const { active_room, active_room_msg, handleChange, handleSubmit, chat_message, divRef, clickUser, onBuzz } = props
 
   const { members, room_name } = active_room
-  console.log(members)
+
   return (
     <div className="Wrapper chat-room">
         <h2 className="room-name">{room_name}</h2>
@@ -28,7 +28,7 @@ export const ChatContainer = (props) => {
           <div className="list">
             {
               members.map((item) => {
-                return <p key={item._id} onClick={() => clickUser(item._id, item.user_name, item.socket_id)}>{item.user_name}</p>
+                return <p key={item._id} onClick={() => clickUser(item._id, item.user_name)}>{item.user_name}</p>
               })
             }
           </div>

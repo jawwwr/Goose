@@ -8,6 +8,8 @@ export const conneXionListener = (io, socket) => {
     connections.push(socket)
     
     socket.on('new_recon_app_user', (data) => {
+        const { _id } = data.user
+        socket.join(_id)
         const rooms = []
         data.user.rooms.map((item) => rooms.push(item.room_name))
         socket.join(rooms, () => {
@@ -18,11 +20,11 @@ export const conneXionListener = (io, socket) => {
             }
             const usrNotifyOthers = {
                 ...usrNotify,
-                meesage: ''
+                message: "is back, say hi!"
             }
 
             socket.emit('new_recon_app_user_update', usrNotify);
-            socket.broadcast.emit('new_recon_app_user_notify', {...usrNotifyOthers, message: "is back, say hi!"});
+            socket.broadcast.emit('new_recon_app_user_notify', usrNotifyOthers);
 
         })
     })
@@ -45,16 +47,17 @@ export const conneXionListener = (io, socket) => {
     })
 
     socket.on('add_new_room', (data) => {
+        console.log(data)
+        const { _id } = data.recipient
         socket.join(data.room.room_name, () => {
             if(data.room.type === 'private') {
-                socket.to(data.room.room_nam).emit('notify_new_convo', {...data.room, message: `You and ${data.user.user_name} are now connected!`});
+                socket.to(_id).emit('notify_new_convo', data);
             } else {
                 // group
                 // emit group data
+                // notify all users for about the new group
             }
         })
-        io.emit('new_room', data.room);
-        socket.emit('new_room_update_me', {...data});
     })
 
     socket.on('on_buzz_all', (data) => {

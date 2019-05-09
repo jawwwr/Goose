@@ -42,7 +42,6 @@ class App extends Component {
       rooms: [],
       messages: [],
       chat_message: '',
-      socket_id: ''
     };
   }
 
@@ -50,10 +49,36 @@ class App extends Component {
 
   async componentDidMount() {
     socket.on('connect', () => {
-      this.setState({
-        socket_id: socket.id
-      })
+      console.log("Connect to socketio.")
     })
+
+
+    const savedId = localStorage.getItem("goose_user_id");
+    if(savedId){
+      // get user data
+      const response = await axios.get(`${apiUrl}/user/${savedId}`)
+      // get all messages
+      const messages = await axios.get(`${apiUrl}/chat`)
+      // get all rooms
+      const rooms = await axios.get(`${apiUrl}/room`)
+      // get all default room
+      const room = await axios.get(`${apiUrl}/room/${this.state.active_room._id}`)
+      this.setState({
+        me: response.data,
+        authenticated: true,
+        messages: messages.data,
+        active_room: room.data,
+        rooms: rooms.data,
+      })
+
+      // emit to socket for reconnecting user, this is when reloaded.
+      onNewUser({user: response.data, rooms: rooms.data, socket_id: socket.id, source: 'reconnect'})
+
+    } else {
+      this.setState({
+        authenticated: false
+      })
+    }
 
       // socket Listeners
 
@@ -111,6 +136,7 @@ class App extends Component {
       // when new room added, update my list.
       socket.on('notify_new_convo', (data) => {
         console.log(data)
+        this._notify(data.message); 
       }); 
 
 
@@ -143,33 +169,6 @@ class App extends Component {
   async componentDidUpdate(prevProps, prevState) {
     if(this.state.authenticated) {
       this._scrollToBottom()
-    }
-
-    if(this.state.socket_id !== prevState.socket_id) {
-      const { socket_id } = this.state
-      const savedId = localStorage.getItem("goose_user_id");
-      if(savedId){
-        // get user data
-        const response = await axios.put(`${apiUrl}/user/socket/${savedId}`, {socket_id})
-        // get all messages
-        const messages = await axios.get(`${apiUrl}/chat`)
-        // get all rooms
-        const rooms = await axios.get(`${apiUrl}/room`)
-        // get all default room
-        const room = await axios.get(`${apiUrl}/room/${this.state.active_room._id}`)
-        this.setState({
-          me: response.data,
-          authenticated: true,
-          messages: messages.data,
-          active_room: room.data,
-          rooms: rooms.data,
-          trigger_render: false,
-        })
-  
-        // emit to socket for reconnecting user, this is when reloaded.
-        onNewUser({user: response.data, rooms: rooms.data, socket_id: socket.id, source: 'reconnect'})
-  
-      }
     }
   }
 
@@ -242,28 +241,25 @@ class App extends Component {
     this.props.history.push(`/${data.room_name}`)
   }
   
-  _onClickUser = async (id, name, socket_id) => {
-    const { _id, socket } = this.state.me
+  _onClickUser = async (id, name) => {
+    const { _id, user_name } = this.state.me
+
+    // check if these two ids exist in a private room
     const response = await axios.get(`${apiUrl}/room/check/private/${_id}/${id}`)
 
     if(response.data.length === 0) {
-      if(window.confirm("This is your first convio with " +name+", continue?")) {
-        const message = `${this.state.me.user_name} wants to have a conversation with you, accept?`
-        const data = {
-          message, 
-          inviter: {
-            name: this.state.me.user_name, 
-            socket_id: this.state.socket_id
-          },
-          recipient: {
-            name,
-            socket_id
-          }
+      const response = await axios.post(`${apiUrl}/room`, {room_name: `${_id}${id}`, type: 'private', creator: _id, members: [_id, id]})
+      const message = `${user_name} initiated a chat with you.`
+      const data = {
+        ...response.data,
+        message,
+        recipient: {
+          name,
+          _id: id
         }
-        onSendInvitation(data)
-        // const response = await axios.post(`${apiUrl}/room`, {room_name: `${_id}${id}`, type: 'private', creator: _id, members: [_id, id]})
-        // onAddRoom(response.data)
       }
+      onAddRoom(data)
+      // onAddRoom(response.data)
     } else {
       const { _id } = this.state.me
       const { members } = response.data[0]
