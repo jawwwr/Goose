@@ -8,7 +8,7 @@ import { Rooms } from '../../Components/Rooms'
 import { ChatContainer } from '../../Components/ChatContainer'
 import { Login } from '../../Components/Login'
 import { apiUrl } from '../../Services/api'
-import { socket, onNewUser, onSendChat, onAddRoom, onSendInvitation, onAcceptedInvite, onBuzz } from '../../Services/socket'
+import { socket, onNewUser, onSendChat, onAddRoom, initConvo, onBuzz, joinUs } from '../../Services/socket'
 import 'react-toastify/dist/ReactToastify.css';
 import 'react-s-alert/dist/s-alert-default.css';
 import 'react-s-alert/dist/s-alert-css-effects/slide.css';
@@ -30,7 +30,6 @@ class App extends Component {
     this._onClickUser = this._onClickUser.bind(this)
     this._scrollToBottom = this._scrollToBottom.bind(this)
     this._notify = this._notify.bind(this)
-    this._onAcceptInvite = this._onAcceptInvite.bind(this)
     this.state = {
       authenticated: false,
       me: '',
@@ -72,7 +71,7 @@ class App extends Component {
       })
 
       // emit to socket for reconnecting user, this is when reloaded.
-      onNewUser({user: response.data, rooms: rooms.data, socket_id: socket.id, source: 'reconnect'})
+      onNewUser({user: response.data, rooms: rooms.data, active: this.state.active_room._id})
 
     } else {
       this.setState({
@@ -84,7 +83,6 @@ class App extends Component {
 
       // when message successfully sent
       socket.on('new_message', (data) => {
-        console.log(data)
         this.setState({
           messages: [
             ...this.state.messages,
@@ -93,8 +91,16 @@ class App extends Component {
         })
       }); 
 
-      // when someone new user or reloaded the browser.
-      socket.on('new_recon_app_user_notify', ({data, message}) => {
+      socket.on('new_buzz', (data) => {
+        Alert.info(`${data.sender.user_name} ${data.text}`, {
+          position: 'bottom-left',
+          effect: 'slide',
+          beep: junel
+        });
+      }); 
+
+      // when new user or reloaded the browser.
+      socket.on('new_recon_app_user_update_notify', ({data, message}) => {
         const active = data.rooms.filter(room => {
           return room._id === this.state.active_room._id
         })
@@ -102,18 +108,13 @@ class App extends Component {
           rooms: data.rooms,
           active_room: active[0]
         })
-        
-        this._notify(`${data.user.user_name} ${message}!`)
+
         this._notify(`${data.user.user_name} ${message}!`)
       }); 
 
       // when someone new user or reloaded the browser.
-      socket.on('new_recon_app_user_update', ({data, message}) => {
-        this.setState({
-          rooms: data.rooms,
-          me: data.user
-        })
-        this._notify(`${data.user.user_name} ${message}!`)
+      socket.on('new_recon_app_user_welcome', ({user, message}) => {
+        this._notify(`${user.user_name} ${message}!`)
       }); 
 
       // when new room added
@@ -133,38 +134,16 @@ class App extends Component {
         })
       }); 
 
-      // when new room added, update my list.
-      socket.on('notify_new_convo', (data) => {
-        console.log(data)
-        this._notify(data.message); 
-      }); 
-
-
-      socket.on('invitation_notify', (data) => {
-        console.log(data)
-        toast(<this.NotifyAction 
-          acceptInvite={this._onAcceptInvite}
-          data={data}/>, {
-          closeButton: false,
-          autoClose: false,
-          draggable: false,
-          hideProgressBar: true,
-          position: toast.POSITION.BOTTOM_LEFT,
-          className: 'goose-toast invite'
+      socket.on('notify_new_convo_join', (data) => {
+        this.setState({
+          rooms: [
+            ...this.state.rooms,
+            data.room
+          ]
         })
-      }); 
-
-      socket.on('invitation_accepted', (data) => {
+        joinUs(data)
         this._notify(data.message); 
-    });
-    // buzzzzerrrr
-      socket.on('buzz_all', (data) => {
-        Alert.info(data, {
-          position: 'bottom-left',
-          effect: 'slide',
-          beep: junel
-      });
-    });
+      }); 
   }
   async componentDidUpdate(prevProps, prevState) {
     if(this.state.authenticated) {
@@ -185,8 +164,8 @@ class App extends Component {
       sender: this.state.me._id,
       text: this.state.chat_message
     }
-    const response = await axios.post(`${apiUrl}/chat`, data)
 
+    const response = await axios.post(`${apiUrl}/chat`, data)
     onSendChat(response.data)
 
     this.setState({
@@ -234,7 +213,6 @@ class App extends Component {
   }
   
   _onSwitchRoom = (data) => {
-    console.log(data)
     this.setState({
       active_room: data,
     })
@@ -242,14 +220,15 @@ class App extends Component {
   }
   
   _onClickUser = async (id, name) => {
+    if(id === this.state.me._id) return false
     const { _id, user_name } = this.state.me
 
     // check if these two ids exist in a private room
-    const response = await axios.get(`${apiUrl}/room/check/private/${_id}/${id}`)
+    const checkRoom = await axios.get(`${apiUrl}/room/check/private/${_id}/${id}`)
 
-    if(response.data.length === 0) {
+    if(checkRoom.data.length === 0) {
       const response = await axios.post(`${apiUrl}/room`, {room_name: `${_id}${id}`, type: 'private', creator: _id, members: [_id, id]})
-      const message = `${user_name} initiated a chat with you.`
+      const message = `${user_name}, ${name} you are now connected.`
       const data = {
         ...response.data,
         message,
@@ -258,18 +237,25 @@ class App extends Component {
           _id: id
         }
       }
-      onAddRoom(data)
-      // onAddRoom(response.data)
+
+      initConvo(data)
+      const active = this._mapMembers(response.data.room)
+      this._onSwitchRoom(active)
     } else {
-      const { _id } = this.state.me
-      const { members } = response.data[0]
-      let result = members.filter(member => member._id !== _id)
-      const active = {
-        ...response.data[0],
-        room_name: result[0].user_name
-      }
+      const active = this._mapMembers(checkRoom.data[0])
       this._onSwitchRoom(active)
     }
+  }
+
+  _mapMembers(response) {
+    const { _id: myId } = this.state.me
+    const { members } = response
+    let result = members.filter(member => member._id !== myId)
+    const active = {
+      ...response,
+      room_name: result[0].user_name
+    }
+    return active
   }
 
   _scrollToBottom() {
@@ -286,12 +272,13 @@ class App extends Component {
     });
   }
   
-  _onAcceptInvite = (data) => {
-      onAcceptedInvite(data)
-  }
-  
   _onBuzzer = () => {
-    onBuzz(this.state.me.user_name)
+    const data = {
+        room: this.state.active_room,
+        sender: this.state.me,
+        text: "buzzz!!!"
+    }
+    onBuzz(data)
   }
 
   NotifyAction = (props, { closeToast }) => {
@@ -324,7 +311,7 @@ class App extends Component {
           const other = members.filter(member => member._id !== this.state.me._id)
           private_room = {
             ...item,
-            room_name: other[0].user_name
+            room_name: other[0].user_name || 'others'
   
           }
           privates.push(private_room)

@@ -19,20 +19,12 @@ const onAddRoom = (data) => {
     socket.emit('add_new_room', data);
 }
 
-const onJoinRoom = (data) => {
-    socket.emit('join_room', data);
+const initConvo = (data) => {
+    socket.emit('on_initiate_convo', data);
 }
 
-const onSendInvitation = (data) => {
-    socket.emit('send_chat_invite_room', data);
-}
-
-const onAcceptedInvite = (data) => {
-    socket.emit('send_chat_invite_accepted', data);
-}
-
-const onCanceledInvite = (data) => {
-    socket.emit('send_chat_invite_denied', data);
+const joinUs = (data) => {
+    socket.emit('join_us_convo_room', data);
 }
 
 const onBuzz = (data) => {
@@ -45,10 +37,8 @@ export {
     onNewUser,
     onSendChat,
     onAddRoom,
-    onJoinRoom,
-    onSendInvitation,
-    onAcceptedInvite,
-    onCanceledInvite,
-    onBuzz
+    onBuzz,
+    initConvo,
+    joinUs
 }
 

@@ -8,61 +8,46 @@ export const conneXionListener = (io, socket) => {
     connections.push(socket)
     
     socket.on('new_recon_app_user', (data) => {
-        const { _id } = data.user
+        const { active } = data
+        const { _id} = data.user
+
         socket.join(_id)
         const rooms = []
-        data.user.rooms.map((item) => rooms.push(item.room_name))
+        data.user.rooms.map((item) => {
+            const { _id: id} = item
+            return rooms.push(id)
+        })
         socket.join(rooms, () => {
-            const usrNotify = {
-                data,
-                message: data.source === 'login' ? 'welcome aboard' : 'welcome back',
-                type: 'notify'
-            }
             const usrNotifyOthers = {
-                ...usrNotify,
-                message: "is back, say hi!"
+                data,
+                message: "is online, say hi!"
             }
 
-            socket.emit('new_recon_app_user_update', usrNotify);
-            socket.broadcast.emit('new_recon_app_user_notify', usrNotifyOthers);
+            socket.emit('new_recon_app_user_welcome', {user: data.user, message: 'welcome!'});
+            socket.to(active).emit('new_recon_app_user_update_notify', usrNotifyOthers);
 
         })
     })
 
     socket.on('send_message', (data) => {
-        const room = data.room.room_name
-        io.in(room).emit('new_message', data);
+        const { _id } = data.room
+        io.in(_id).emit('new_message', data);
     })
 
-    socket.on('send_chat_invite_room', (data) => {
-        io.to(data.recipient.socket_id).emit('invitation_notify', data)
+    socket.on('on_initiate_convo', (data) => {
+        const { _id: recipientId } = data.recipient
+        socket.to(recipientId).emit('notify_new_convo_join', data);
+        socket.emit('notify_new_convo_join', data);
     })
 
-    socket.on('send_chat_invite_accepted', (data) => {
-        const newData = {
-            ...data,
-            message: `${data.recipient.name} accepted your chat invitation!`
-        }
-        io.to(data.inviter.socket_id).emit('invitation_accepted', newData)
-    })
-
-    socket.on('add_new_room', (data) => {
-        console.log(data)
-        const { _id } = data.recipient
-        socket.join(data.room.room_name, () => {
-            if(data.room.type === 'private') {
-                socket.to(_id).emit('notify_new_convo', data);
-            } else {
-                // group
-                // emit group data
-                // notify all users for about the new group
-            }
-        })
+    socket.on('join_us_convo_room', (data) => {
+        const { _id } = data.room
+        socket.join(_id)
     })
 
     socket.on('on_buzz_all', (data) => {
-        const message = `${data} buzzzz!!`
-        io.emit('buzz_all', message);
+        const { _id } = data.room
+        socket.to(_id).emit('new_buzz', data);
     })
     
 }

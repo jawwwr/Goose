@@ -7,10 +7,10 @@ export const ChatRoom = (props) => {
     <div className="Wrapper chat-room">
       <div className="list">
       {
-        data.map((item) => {
+        data.map((item, i) => {
           return <div 
               className={item.sender.user_name === localStorage.getItem('goose_user_name') ? "msg right" : "msg left"}
-              key={item._id}>
+              key={i}>
               <p>
               {item.sender.user_name}
               </p>
