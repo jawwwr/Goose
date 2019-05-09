@@ -8,7 +8,7 @@ const roomOpts = [{ path: 'members', select: 'user_name' }, { path: 'creator', s
 async function create (ctx) {
   const { body } = ctx.request
   const { user_name, rooms } = body
-  const user = await User.findOneAndUpdate({ user_name }, body, {upsert: true})
+  const user = await User.findOneAndUpdate({ user_name }, body, {upsert: true, new: true})
   const { _id: members } = user
 
   await Room.findByIdAndUpdate({_id: rooms}, {$addToSet: { members }}, {new: true})
