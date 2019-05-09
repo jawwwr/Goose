@@ -4,8 +4,6 @@ export const conneXionListener = (io, socket) => {
     socket.on('error', (error) => {
         socket.send(error)
       });
-    const connections = []
-    connections.push(socket)
     
     socket.on('new_recon_app_user', (data) => {
         const { active } = data

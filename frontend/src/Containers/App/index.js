@@ -47,6 +47,7 @@ class App extends Component {
   messagesEnd = React.createRef()
 
   async componentDidMount() {
+
     socket.on('connect', () => {
       console.log("Connect to socketio.")
     })
@@ -81,6 +82,24 @@ class App extends Component {
 
       // socket Listeners
 
+      // new login, greet me
+      socket.on('new_recon_app_user_welcome', ({user, message}) => {
+        this._notify(`${user.user_name} ${message}!`)
+      }); 
+
+      // new login or reloaded the browser
+      socket.on('new_recon_app_user_update_notify', ({data, message}) => {
+        const active = data.rooms.filter(room => {
+          return room._id === this.state.active_room._id
+        })
+        this.setState({
+          rooms: data.rooms,
+          active_room: active[0]
+        })
+
+        this._notify(`${data.user.user_name} ${message}!`)
+      }); 
+
       // when message successfully sent
       socket.on('new_message', (data) => {
         this.setState({
@@ -99,41 +118,6 @@ class App extends Component {
         });
       }); 
 
-      // when new user or reloaded the browser.
-      socket.on('new_recon_app_user_update_notify', ({data, message}) => {
-        const active = data.rooms.filter(room => {
-          return room._id === this.state.active_room._id
-        })
-        this.setState({
-          rooms: data.rooms,
-          active_room: active[0]
-        })
-
-        this._notify(`${data.user.user_name} ${message}!`)
-      }); 
-
-      // when someone new user or reloaded the browser.
-      socket.on('new_recon_app_user_welcome', ({user, message}) => {
-        this._notify(`${user.user_name} ${message}!`)
-      }); 
-
-      // when new room added
-      socket.on('new_room', (data) => {
-        this.setState({
-          rooms: [
-            ...this.state.rooms,
-            data
-          ]
-        })
-      }); 
-
-      // when new room added, update my list.
-      socket.on('new_room_update_me', (data) => {
-        this.setState({
-          me: data.user,
-        })
-      }); 
-
       socket.on('notify_new_convo_join', (data) => {
         this.setState({
           rooms: [
@@ -145,6 +129,9 @@ class App extends Component {
         this._notify(data.message); 
       }); 
   }
+
+
+
   async componentDidUpdate(prevProps, prevState) {
     if(this.state.authenticated) {
       this._scrollToBottom()
@@ -279,19 +266,6 @@ class App extends Component {
         text: "buzzz!!!"
     }
     onBuzz(data)
-  }
-
-  NotifyAction = (props, { closeToast }) => {
-    const {data, acceptInvite} = props
-    return (
-      <div className="notify-action">
-        <p>{data.message}</p>
-        <div className="actions">
-          <button className="action yes" onClick={()=>acceptInvite(data)}>Yes</button>
-          <button className="action no" onClick={closeToast}>No</button>
-        </div>
-      </div>
-    )
   }
 
   render() {
